@@ -2,7 +2,7 @@ import paho.mqtt.client as cli
 import threading
 from DbManager import sensor_data_handler
 
-MQTT_Topic = "/impetus/rtb/temprature/#"
+MQTT_Topic = "/impetus/rtb/#"
 HOST = "test.mosquitto.org"
 PORT = 1883
 KEEP_ALIVE = 60
