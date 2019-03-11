@@ -1,11 +1,13 @@
 import smtplib
 
+threshold = 30
+
 
 def mail_dispatch():
     # creates SMTP session
     s = smtplib.SMTP('smtp.gmail.com', 587)
     s.starttls()
-    s.login("4rohit25@gmail.com", "XXXXXX")
+    s.login("4rohit25@gmail.com", "XXXXXXXXX")
     subject = "Temprature exceed"
     body = "Hello this is for test"
     message = 'Subject: {}\n\n{}'.format(subject, body)
@@ -13,6 +15,6 @@ def mail_dispatch():
     s.quit()
 
 
-def validator(data, threshold):
-    if data < threshold:
+def validator(data):
+    if float(data) > float(threshold):
         mail_dispatch()
