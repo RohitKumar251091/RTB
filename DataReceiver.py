@@ -1,9 +1,10 @@
 import paho.mqtt.client as cli
 import threading
 from DbManager import sensor_data_handler
+import urllib.request
 
 MQTT_Topic = "/impetus/rtb/#"
-HOST = "test.mosquitto.org"
+HOST = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").read().decode('utf-8')
 PORT = 1883
 KEEP_ALIVE = 60
 
