@@ -1,18 +1,3 @@
-/*
-ESP8266/ESP32 publish the RSSI as the WiFi signal strength to ThingSpeak channel.
-This example is for explaining how to use the AutoConnect library.
-
-In order to execute this example, the ThingSpeak account is needed. Sing up
-for New User Account and create a New Channel via My Channels.
-For details, please refer to the project page.
-https://hieromon.github.io/AutoConnect/examples/index.html#used-with-mqtt-as-a-client-application
-
-This example is based on the environment as of March 20, 2018.
-Copyright (c) 2018 Hieromon Ikasamo.
-This software is released under the MIT License.
-https://opensource.org/licenses/MIT
-*/
-
 #if defined(ARDUINO_ARCH_ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
@@ -104,6 +89,26 @@ unsigned long lastPub = 0;
 
 #define MQTT_Device_ID  "TEMPRATURE"
 
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+
+  // Switch on the LED if an 1 was received as first character
+  if ((char)payload[0] == '1') {
+    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
+    // but actually the LED is on; this is because
+    // it is active low on the ESP-01)
+  } else {
+    digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
+  }
+
+}
+
 bool mqttConnect() {
   static const char alphanum[] = "0123456789"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -124,7 +129,8 @@ bool mqttConnect() {
     clientId[8] = '\0';
 
     if (mqttClient.connect(clientId, MQTT_Device_ID, userkey.value.c_str())) {
-      
+      mqttClient.subscribe("/impetus/rtb/sub/");
+      mqttClient.setCallback(callback);
       Serial.println("Established:" + String(clientId));
       return true;
     }
@@ -222,7 +228,7 @@ void creatJSON(float t, float h){
 }
 
 void mqttPublish(String msg) {
-  String path = String("/impetus/rtb/") + userid.value + String("/") + channelid.value + MQTT_Device_ID + apikey.value;
+  String path = String("/impetus/rtb/pub/") + userid.value + String("/") + channelid.value + MQTT_Device_ID + apikey.value;
   mqttClient.publish(path.c_str(), msg.c_str());
 }
 
